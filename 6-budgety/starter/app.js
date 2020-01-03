@@ -56,19 +56,76 @@ var controller = (function(budgetCtrl, UICtrl) {
 // BUDGET CONTROLLER
 var budgetController = (function() {
   
+  var Expense = function(id, description, value) {
+    this.id = id,
+    this.description = description,
+    this.value = value
+  }
+
+  var Income = function(id, description, value) {
+    this.id = id,
+    this.description = description,
+    this.value = value
+  }
+
+  return {
+    expense: function(id, descript, val) {
+      return Expense(id, descript, val);
+    }
+  };
+  
+
 }) ();
 
 // UI CONTROLLER
 var UIController = (function() {
-  // some code
+  
+  // Compile all strings from the HTML in a central place to retrieve them, but also to make
+  // it easy if something in the HTML will changed later on there will only be one place
+  // (right here) where need to change it in the backend.
+  var DOMstrings = {
+    inputType: '.add__type',
+    inputDescription: '.add__description',
+    inputValue: '.add__value',
+    inputButton: '.add__btn',
+  }
+
+  return {
+    getinput: function() {
+      return {
+        type: document.querySelector(DOMstrings.inputType).value,  // income (inc) or expense (exp)
+        description: document.querySelector(DOMstrings.inputDescription).value,
+        value: document.querySelector(DOMstrings.inputValue).value,
+      };
+    },
+    getDOMstrings: function() {
+      return DOMstrings;
+    }
+  };
 }) ();
 
 // GLOBAL APP CONTROLLER
 var controller = (function(budgetCtrl, UICtrl) {
 
+  // Set up all event listeners here:
+  var setupEventListeners = function () {
+    var DOM = UICtrl.getDOMstrings();
+    // Set up the event listener for the input button.
+    document.querySelector(DOM.inputButton).addEventListener('click', ctrlAddItem);
+
+    // Add another listener in case user does not click the checkmark button, but instead hits
+    // the return key (i.e., the enter key).
+    document.addEventListener('keypress', function (event) {
+      if (event.keyCode === 13 || event.which === 13) {
+        ctrlAddItem();
+      }
+    })
+  }
+
+  // Main logic:
   var ctrlAddItem = function() {
     // 1. Get the field input data
-
+    var input = UICtrl.getinput();
     // 2. Add the item to the budget controller
 
     // 3. Add the item to the UI
@@ -77,20 +134,16 @@ var controller = (function(budgetCtrl, UICtrl) {
 
     // 5. Display the budget on the UI
 
-    console.log('hurray...')
   }
 
-  // Set up the event listener for the input button.
-  document.querySelector('.add__btn').addEventListener('click', ctrlAddItem);
-
-  // Add another listener in case user does not click the checkmark button, but instead hits
-  // the return key (i.e., the enter key).
-  document.addEventListener('keypress', function(event) {
-
-    if (event.keyCode === 13 || event.which === 13) {
-      ctrlAddItem();
+  return {
+    init: function() {
+      console.log('Application has started.');
+      setupEventListeners();
     }
-  })
+  }
+
 
 }) (budgetController, UIController);
 
+controller.init();
