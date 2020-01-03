@@ -473,16 +473,16 @@ game(questions);
   // function in this case is keepScore, which is difficult to infer from this function here
   // (unless you know it, how would someone new to the code know where that callback is defined?)
   Question.prototype.checkAnswer = function(ans, callback) {
-    var sc;  // score
+    var userScore;  // score
     if (ans === this.correctAnswer) {
       console.log('Correct answer!');
-      sc = callback(true);
+      userScore = callback(true);
     } else {
       console.log('Wrong answer - try again :)');
-      sc = callback(false);
+      userScore = callback(false);
     }
 
-    this.displayScore(sc);
+    this.displayScore(userScore);
   }
 
   Question.prototype.displayScore = function(score) {
