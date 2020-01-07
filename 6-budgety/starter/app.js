@@ -60,7 +60,26 @@ var budgetController = (function() {
   var Expense = function(id, description, value) {
     this.id = id,
     this.description = description,
-    this.value = value
+    this.value = value,
+    this.percentage =1
+  };
+
+  Expense.prototype.calcPercentage = function(totalIncome) {
+    // We add this method to the constructor's prototype such that each instance we create
+    // of this constructor will inherit the method. IOWs, the method is not specific to an
+    // instance (in that case it should be part of the constructor!), but generic to all 
+    // instances of that constructor.
+    if (totalIncome > 0) {
+      this.percentage = Math.round((this.value / totalIncome) * 100);
+    } else {
+      this.percentage = -1;
+    }
+  };
+
+  Expense.prototype.getPercentage = function() {
+    // In the spirit of code modularity this function returns the percentage, but function
+    // calcPercentage (above) computes percentages.
+    return this.percentage;
   };
 
   var Income = function(id, description, value) {
@@ -158,6 +177,30 @@ var budgetController = (function() {
       }
     },
 
+    calculatePercentages: function() {
+
+      /*
+      a=20
+      b=10
+      c=40
+      income=100
+      a=20/100=20%
+      */ 
+
+      data.allItems.exp.forEach(function(cur) {
+        cur.calcPercentage(data.totals.inc);
+      })
+    },
+
+    getPercentages: function() {
+      // Here we use the map function as we would like to have a new array returned from the 
+      // operation.
+      var allPerc = data.allItems.exp.map(function(cur) {
+        return cur.getPercentage();
+      })
+      return allPerc;  // array containing all percentages
+    },
+
     getBudget: function() {
       return {
         budget: data.budget,
@@ -194,10 +237,10 @@ var UIController = (function() {
     incomeLabel: '.budget__income--value',
     expensesLabel: '.budget__expenses--value',
     percentageLabel: '.budget__expenses--percentage',
-    container: '.container'  // parent class of both inc and exp
-
+    container: '.container',
+    expensesPercLabel: '.item__percentage'
   }
-
+  // parent class of both inc and exp
   return {
     getinput: function() {
       return {
@@ -270,6 +313,33 @@ var UIController = (function() {
 
     },
 
+    displayPercentages: function(percentages) {
+      // Here we're using a custom-made loop function, that takes advantage of the
+      // callback function mechanism in JavaScript.
+
+      // fields is a node list (i.e., NOT an array).
+      var fields = document.querySelectorAll(DOMstrings.expensesPercLabel);
+
+      var nodeListForEach = function(list, callback) {
+        // This function calls the callback function for each element in the node list. By creating
+        // a separate function we can reuse this for any node list throughout the app.
+        // list in this case will be fields (i.e. the node list). 
+        for (var i = 0; i < list.length; i++) {
+          callback(list[i], i);
+        }
+      };
+
+      nodeListForEach(fields, function(current, index) {
+
+        if (percentages[index] > 0) {
+          current.textContent = percentages[index] + '%';
+        } else {
+          current.textContent = '---';
+        }
+      });
+
+    },
+
     getDOMstrings: function() {
       return DOMstrings;
     }
@@ -311,6 +381,18 @@ var controller = (function(budgetCtrl, UICtrl) {
     //console.log(budget);
   }
 
+  var updatePercentages = function() {
+
+    // 1. Calculate percentages.
+    budgetCtrl.calculatePercentages();
+
+    // 2. Read them from the budget controller.
+    var percentages = budgetCtrl.getPercentages();
+
+    // 3. Update percentage on the UI.
+    UICtrl.displayPercentages(percentages);
+  };
+
   // @ts-check
   var ctrlAddItem = function() {
     var input, newItem;
@@ -331,6 +413,9 @@ var controller = (function(budgetCtrl, UICtrl) {
 
       // 5. Calculate and update budget.
       updateBudget();
+
+      // 6. Calculate and update percentages.
+      updatePercentages();
     }
   };
 
@@ -356,6 +441,9 @@ var controller = (function(budgetCtrl, UICtrl) {
 
       // 3. Update and show the new budget.
       updateBudget();
+      
+      // 4. Calculate and update percentages.
+      updatePercentages();
 
     };
   }
