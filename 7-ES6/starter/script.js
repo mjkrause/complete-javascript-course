@@ -412,6 +412,7 @@ var emily = new SmithPerson('Emily', 1983, 'Diaz', 'spanish');
 
 */
 
+/*
 // ES6
 function SmithPerson(firstName, yearOfBirth, lastName = 'Smith', nationality = 'American') {
 
@@ -449,7 +450,9 @@ console.log(question.get('question'));
   console.log(`This is ${key}, and it's set to ${value}.`);
 }) */
 
-for (let [key, value] of question.entries()) {
+
+
+/* for (let [key, value] of question.entries()) {
   if (typeof(key) === 'number') {
     console.log(`Answer ${key}: ${value}.`);
   }
@@ -459,6 +462,189 @@ const ans = parseInt(prompt('Write the correct answer.'));
 console.log(question.get(ans === question.get('correct')));
 
 
+ */
+
+
+ ///////////////////////////////////////////////////////
+ // LECTURE: Classes and Subclasses
+
+/*  // ES5
+ var Person5 = function(name, yearOfBirth, job) {
+   this.name = name,
+   this.yearOfBirth = yearOfBirth,
+   this.job = job
+ }
+
+ Person5.prototype.calculateAge = function() {
+   var age = new Date().getFullYear() - this.yearOfBirth;
+   console.log(age);
+ }
+
+ // the .call() method is from the prototype class.
+ var Athlete5 = function(name, yearOfBirth, job, olympicGames, medals) {
+   Person5.call(this, name, yearOfBirth, job);  // to call the super class
+   this.olympicGames = olympicGames;
+   this.medals = medals;
+ }
+
+
+
+// To have Athlete5 inherit from Person5 we call the .create() method from the prototype class
+// to (manually) set the correct prototype chain for the Athlete5 class (this operation basically
+// makes Person5 the superclass of Athlete5).
+ Athlete5.prototype = Object.create(Person5.prototype);
+
+// Set methods specifically on the Athlete5 class. IOWs, Person5 instances will not inherit this
+// method.
+// NOTE: assigning this new method to the Athlete5 class has to occur after we connected it to
+// the Person5 prototype (using .create()).
+Athlete5.prototype.wonMedal = function() {
+  this.medals++;  // each time the method is called the number of medals is incremented
+  console.log(this.medals);
+}
+
+var johnAthlete5 = new Athlete5('John', 1990, 'swimmer', 3, 10);
+
+johnAthlete5.calculateAge();  // This works because everything in Person5 class has been inherited
+// by the johnAthlete class up to this point.
+
+johnAthlete5.wonMedal(); */
+
+/* // ES6  CREATING CLASSES AND SUBCLASSES IS MUCH EASIER!!
+class Person6 {
+  constructor(name, yearOfBirth, job) {
+    this.name = name;
+    this.yearOfBirth = yearOfBirth;
+    this.job = job;
+  }
+
+  calculateAge = function() {
+    var age = new Date().getFullYear() - this.yearOfBirth;
+    console.log(age);
+  }
+}
+
+// Create subclass.
+class Athlete6 extends Person6 {
+  constructor(name, yearOfBirth, job, olympicGames, medals) {
+    super(name, yearOfBirth, job);  // this saves us from explicitly assigning input arguments
+    // name, yearOfBirth, and job to the this keyword (this is done behind the scenes by the
+    // super keyword). All we need to do is to assign the input arguments specific to this subclass
+    // to the this keyword.
+    this.olympicGames = olympicGames;
+    this.medals = medals;
+  }
+
+  // This is how new instance methods are added to the subclass (note simplified syntax!).
+  wonMedal() {
+    this.medals++;
+    console.log(this.medals);
+  }
+}
+
+const johnAthlete6 = new Athlete6('John', 1990, 'runner', 4, 2);
+johnAthlete6.wonMedal();
+johnAthlete6.calculateAge(); */
+
+
+////////////////////////////////////////////////////////////
+// CODING CHALLANGE 8
+
+class TownElement {
+  constructor (name, yearBuilt) {
+    this.name = name;
+    this.yearBuilt = yearBuilt;
+  }
+}
+
+class Park extends TownElement {
+  constructor(name, yearBuilt, area, nTrees) {
+    super(name, yearBuilt);
+    this.area = area;
+    this.nTrees = nTrees;
+  };
+
+  treeDensity() {
+    return this.nTrees / this.area;
+  }
+
+  calcAge() {
+    return new Date().getFullYear() - this.yearBuilt;
+  }
+}
+
+class Street extends TownElement {
+  constructor(name, yearBuilt, length, type) {
+    super(yearBuilt);
+    this.length = length;
+    this.type = type;
+  }
+}
+
+// Park instances.
+const milleniumPark = new Park('Millenium Park', 2000, 2500, 50);
+const boomerPark = new Park('Baby Boomer', 1960, 3000, 2000);
+const genXPark = new Park('Generation X Park', 1990, 5000, 10000);
+
+// Street instances.
+const yupperStreet = new Street('Yupper Street', 1923, 1000, 'huge');
+const loserLane = new Street('Loser Lane', 2000, 10, 'small');
+const winnerAlley = new Street('Winner Alley', 1983, 500, 'big');
+const bozoAve = new Street('Bozo Avenue', 2015, 200, 'normal');
+
+const parks = [milleniumPark, boomerPark, genXPark];
+const streets = [yupperStreet, loserLane, winnerAlley, bozoAve];
+
+// Compute average age of parks: 
+function avgAges(arr) {
+  let ages = arr.map(cur => cur.calcAge());
+  return calcAvg(ages);
+}
+
+function calcAvg(arr) {
+  let res = 0;
+  arr.forEach(cur => res += cur);
+  return res / arr.length;
+}
+
+// Compute average length of street:
+function calcTotalLength(arr) {
+  let len = 0;
+  arr.forEach(cur => len += cur.length);
+  return len;
+}
+
+function reportDensity(arr) {
+  arr.forEach(cur => console.log(`${cur.name} has a tree density of ${cur.nTrees/cur.area} trees per square km.`));
+}
+
+// In this function we use an arrow function with more than 1 line of code. In this case we need
+// to use curly braces inside the arrow function.
+function reportIfMoreThan1000Trees(arr) {
+  arr.forEach(cur => {
+    if (cur.nTrees >= 1000) {
+    console.log(`${cur.name} has more than 1000 trees.`)
+    }
+  }
+)};
+
+// Use a map data structure to print the text.
+const streetType = new Map();
+streetType.set([yupperStreet.name, yupperStreet.yearBuilt], 'huge');
+streetType.set([loserLane.name, loserLane.yearBuilt], 'small');
+streetType.set([winnerAlley.name, winnerAlley.yearBuilt], 'big');
+streetType.set([bozoAve.name, bozoAve.yearBuilt], 'normal');
+
+console.log('------PARKS REPORT--------')
+console.log(`Our ${parks.length} parks have an average age of ${avgAges(parks)} years.`)
+reportDensity(parks);
+reportIfMoreThan1000Trees(parks);
+
+console.log('------STREETS REPORT--------')
+console.log(`Our ${streets.length} streets have a total length of ${calcTotalLength(streets)} km, with an average of ${calcTotalLength(streets)/streets.length}.`)
+streetType.forEach((value, key) => {
+  console.log(`${key[0]}, built in ${key[1]}, is a ${value} street.`)
+});
 
 
 
