@@ -67,7 +67,11 @@
             })
         }
 
-        // Here avoid callback-hell by simply chaining the promises.
+    /*     // Here avoid callback-hell by simply chaining the promises. That is, here the getIDs
+        // variable calls the "then" method and defined a return value. To that "then" method
+        // another then method can be chained, which can consume the return value of the previous
+        // then method, and so on and so forth... That way callback hell is avoided.
+
         getIDs.
         then(IDs => {
             console.log(IDs);
@@ -75,14 +79,43 @@
         })
         .then(recipe => {
             console.log(recipe);
-            return getRelated('Jonas');
+            return getRelated('Jonas Schmedtmann');
         })
         .then(recipe => {
             console.log(recipe);
         })
         .catch(error => {
             console.log('Error!!');
-        });
+        }); */
+
+/*         // The code above inside the comment is re-expressed here below but by using the 
+        // ASYNC/AWAIT construct. The "async" function runs in the background, and the "await"
+        // keyword can only be used inside of an "async" function.
+        async function getRecipesAW() {
+
+            // THe beauty of async/await is that the following line, i.e., code inside the 
+            // await function, looks like normal, asynchronous JavaScript code, although it is 
+            // executed in an asynchronous way.
+
+            const IDs = await getIDs;  // getIDs here is the promise, and the await keyword will
+            // suspend execution of the promise until it is fullfilled. 
+            console.log(IDs);
+
+            const recipe = await getRecipe(IDs[2]);
+            console.log(recipe);
+
+            const related = await getRelated('Jonas Schmedtmann');
+            console.log(related);
+
+            return recipe;
+        }
+
+        // THe following will run synchronously:
+        // Specifically, this line synchronously calls the getRecipeAW function, which itself
+        // runs asynchronously in the background.
+        getRecipesAW().then(result => console.log(`${result} is the best ever.`)); */
+
+        fetch('https://www.metaweather.com/api/location/2487956/');
 
     </script>
 </body>
