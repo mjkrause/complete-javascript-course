@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { url } from '../config';
 
 export default class Search {
   constructor(query) {
@@ -7,7 +8,6 @@ export default class Search {
 
   async getResults() {
 
-    const url = 'https://forkify-api.herokuapp.com';
     // const proxy = 'https://cors-anywhere.herokuapp.com/';  // not needed with this URL
 
     // For error handling we need to use the try/catch construct.

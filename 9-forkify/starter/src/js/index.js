@@ -81,9 +81,13 @@ elements.searchResultsPages.addEventListener('click', event => {
 /**
  * RECIPE CONTROLLER
  */
-const r = new Recipe(46956);
-r.getRecipe();
-console.log(r);
 
-/* search.getResults(); */
+const controlRecipe = () => {
+  const id = window.location.hash;
+  console.log(id)
+};
 
+// The window object is the parent object of the browser.
+// Further, we're looking for the change in the ID which we
+// programmed as a query parameter, so now we can listen for it:
+window.addEventListener('hashchange', controlRecipe);
